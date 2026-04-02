@@ -1,0 +1,425 @@
+/**
+ * Material Design 3 - QA Interface Component
+ * Chat-style Q&A following MD3 Expressive theme
+ */
+
+.qa-interface {
+  background-color: var(--md-sys-color-surface);
+  border-radius: var(--md-sys-shape-corner-large);
+  box-shadow: var(--md-sys-elevation-level1);
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+}
+
+.qa-header {
+  padding: var(--md-sys-spacing-6);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  background-color: var(--md-sys-color-surface-container-low);
+}
+
+.qa-header h2 {
+  font-family: var(--md-sys-typescale-headline-small-font);
+  font-size: var(--md-sys-typescale-headline-small-size);
+  font-weight: var(--md-sys-typescale-headline-small-weight);
+  color: var(--md-sys-color-on-surface);
+  margin: 0 0 var(--md-sys-spacing-2) 0;
+}
+
+.qa-header p {
+  font-family: var(--md-sys-typescale-body-medium-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+.qa-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--md-sys-spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--md-sys-spacing-4);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: var(--md-sys-spacing-4);
+  opacity: 0.6;
+}
+
+.empty-state p {
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  margin-bottom: var(--md-sys-spacing-5);
+}
+
+/* MD3 Suggestion Chips */
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--md-sys-spacing-2);
+  justify-content: center;
+}
+
+.suggestion-chips button {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--md-sys-spacing-4);
+  background-color: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-small);
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  transition:
+    background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.suggestion-chips button:hover {
+  background-color: var(--md-sys-color-secondary-container);
+  border-color: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+/* Message Bubbles */
+.message {
+  display: flex;
+  gap: var(--md-sys-spacing-3);
+  max-width: 80%;
+  animation: messageSlideIn var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.question {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message.answer {
+  align-self: flex-start;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background-color: var(--md-sys-color-surface-container-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.message.question .message-avatar {
+  background-color: var(--md-sys-color-primary-container);
+}
+
+.message-content {
+  background-color: var(--md-sys-color-surface-container);
+  padding: var(--md-sys-spacing-3) var(--md-sys-spacing-4);
+  border-radius: var(--md-sys-shape-corner-large);
+}
+
+.message.question .message-content {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.message-content p {
+  font-family: var(--md-sys-typescale-body-medium-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  margin: 0 0 var(--md-sys-spacing-2) 0;
+}
+
+.message-meta {
+  display: flex;
+  gap: var(--md-sys-spacing-3);
+  align-items: center;
+}
+
+.message-time {
+  font-family: var(--md-sys-typescale-body-small-font);
+  font-size: var(--md-sys-typescale-body-small-size);
+  opacity: 0.7;
+}
+
+/* Confidence Badge - MD3 Chip */
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--md-sys-spacing-2);
+  border-radius: var(--md-sys-shape-corner-small);
+  font-family: var(--md-sys-typescale-label-small-font);
+  font-size: var(--md-sys-typescale-label-small-size);
+  font-weight: 500;
+}
+
+.confidence-badge.high {
+  background-color: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+
+.confidence-badge.medium {
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.confidence-badge.low {
+  background-color: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+
+/* Input Form */
+.input-form {
+  display: flex;
+  gap: var(--md-sys-spacing-3);
+  padding: var(--md-sys-spacing-4) var(--md-sys-spacing-6);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  background-color: var(--md-sys-color-surface-container-low);
+}
+
+/* MD3 Outlined Text Field */
+.input-form input {
+  flex: 1;
+  padding: var(--md-sys-spacing-3) var(--md-sys-spacing-4);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-full);
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface);
+  transition:
+    border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.input-form input::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.input-form input:hover:not(:focus) {
+  border-color: var(--md-sys-color-on-surface);
+}
+
+.input-form input:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  border-width: 2px;
+}
+
+/* MD3 Filled Button */
+.input-form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--md-comp-button-height);
+  padding: 0 var(--md-sys-spacing-6);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+  cursor: pointer;
+  transition:
+    box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+    opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.input-form button:hover:not(:disabled) {
+  box-shadow: var(--md-sys-elevation-level1);
+}
+
+.input-form button:disabled {
+  background-color: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-surface);
+  opacity: var(--md-sys-state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* Markdown 渲染样式 */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+  margin-top: var(--md-sys-spacing-4);
+  margin-bottom: var(--md-sys-spacing-2);
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.message-content h1 { font-size: 1.5em; }
+.message-content h2 { font-size: 1.3em; }
+.message-content h3 { font-size: 1.15em; }
+.message-content h4 { font-size: 1.05em; }
+
+.message-content ul,
+.message-content ol {
+  margin: var(--md-sys-spacing-2) 0;
+  padding-left: var(--md-sys-spacing-6);
+}
+
+.message-content li {
+  margin-bottom: var(--md-sys-spacing-1);
+  line-height: 1.6;
+}
+
+.message-content code {
+  background-color: var(--md-sys-color-surface-container-highest);
+  padding: 2px 6px;
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+}
+
+.message-content pre {
+  margin: var(--md-sys-spacing-3) 0;
+  border-radius: var(--md-sys-shape-corner-medium);
+  overflow-x: auto;
+}
+
+.message-content pre > div {
+  border-radius: var(--md-sys-shape-corner-medium) !important;
+  margin: 0 !important;
+}
+
+.message-content blockquote {
+  margin: var(--md-sys-spacing-3) 0;
+  padding: var(--md-sys-spacing-2) var(--md-sys-spacing-4);
+  border-left: 4px solid var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: 0 var(--md-sys-shape-corner-small) var(--md-sys-shape-corner-small) 0;
+}
+
+.message-content blockquote p {
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Markdown 表格样式 */
+.markdown-table-wrapper {
+  overflow-x: auto;
+  margin: var(--md-sys-spacing-3) 0;
+}
+
+.message-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.message-content th,
+.message-content td {
+  padding: var(--md-sys-spacing-2) var(--md-sys-spacing-3);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  text-align: left;
+}
+
+.message-content th {
+  background-color: var(--md-sys-color-surface-container-high);
+  font-weight: 600;
+}
+
+.message-content tr:nth-child(even) {
+  background-color: var(--md-sys-color-surface-container-low);
+}
+
+/* 链接样式 */
+.message-content a {
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+}
+
+.message-content a:hover {
+  text-decoration: underline;
+}
+
+/* 水平分割线 */
+.message-content hr {
+  border: none;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  margin: var(--md-sys-spacing-4) 0;
+}
+
+/* 强调文本 */
+.message-content strong {
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.message-content em {
+  font-style: italic;
+}
+
+/* 答案消息的最大宽度调整 */
+.message.answer {
+  max-width: 90%;
+}
+
+.message.answer .message-content {
+  max-width: 100%;
+}
+
+/* 流式响应样式 */
+.message.streaming .message-content {
+  position: relative;
+}
+
+.streaming-cursor {
+  display: inline-block;
+  animation: blink 1s step-end infinite;
+  color: var(--md-sys-color-primary);
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* 流式消息的渐入效果 */
+.message.streaming {
+  animation: none;
+}
+
+.message.streaming .message-content {
+  min-height: 40px;
+}

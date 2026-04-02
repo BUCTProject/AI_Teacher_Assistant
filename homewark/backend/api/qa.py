@@ -1,0 +1,336 @@
+"""
+Q&A Triage Router - Handles AI-powered Q&A endpoints
+"""
+from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi.responses import StreamingResponse
+from typing import Optional, List, AsyncGenerator
+from datetime import datetime, timedelta
+from core.time import utc_now
+import logging
+import json
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.database import get_db
+from schemas.qa import (
+    QuestionRequest,
+    QuestionResponse,
+    QAAnalyticsReport,
+    EscalationRequest
+)
+from schemas.qa_log import QALogCreate, QALogResponse, QALogStats
+from schemas.triage import TeacherAnswerRequest, TeacherAnswerResponse
+from schemas.common import APIResponse
+from services.qa_service import qa_service
+from services.qa_engine_service import qa_engine_service
+from services.ai_service import ai_service
+from api.deps import get_current_teacher_or_admin
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/qa", tags=["Q&A Triage"])
+
+
+@router.post("/ask", response_model=QuestionResponse)
+async def ask_question(request: QuestionRequest):
+    """
+    Submit a question for AI-powered answering.
+
+    - Automatically categorizes the question by complexity
+    - Provides AI-generated answers for common questions
+    - Escalates complex questions to teachers when needed
+    """
+    try:
+        response = await qa_service.answer_question(request)
+        return response
+    except Exception as e:
+        logger.error(f"Q&A 请求处理失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/ask-stream")
+async def ask_question_stream(request: QuestionRequest):
+    """
+    流式回答问题 - 使用 Server-Sent Events (SSE) 逐步返回答案
+
+    前端可以实时显示 AI 正在生成的内容，提升用户体验
+    """
+    async def generate() -> AsyncGenerator[str, None]:
+        try:
+            # 发送开始事件
+            yield f"data: {json.dumps({'type': 'start', 'question_id': request.student_id})}\n\n"
+
+            # 流式生成答案
+            full_answer = ""
+            async for chunk in ai_service.answer_question_stream(
+                request.question,
+                f"Course: {request.course_id}" if request.course_id else ""
+            ):
+                full_answer += chunk
+                yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
+
+            # 发送完成事件，包含完整答案和元数据
+            confidence = 0.85 if len(full_answer) > 100 else 0.6
+            uncertainty_keywords = ["不确定", "可能", "也许", "不太清楚", "需要确认"]
+            needs_review = any(keyword in full_answer for keyword in uncertainty_keywords)
+
+            yield f"data: {json.dumps({'type': 'done', 'confidence': confidence, 'needs_review': needs_review})}\n\n"
+
+        except Exception as e:
+            logger.error(f"流式 Q&A 请求处理失败: {str(e)}")
+            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
+
+@router.post("/escalate", response_model=QuestionResponse)
+async def escalate_question(request: EscalationRequest):
+    """
+    Escalate a question to a teacher.
+    
+    Use this when the AI answer is insufficient or the student
+    needs more detailed explanation.
+    """
+    try:
+        response = await qa_service.escalate_question(request)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/analytics/{course_id}", response_model=QAAnalyticsReport)
+async def get_qa_analytics(
+    course_id: str,
+    days: int = Query(default=30, ge=1, le=365, description="Number of days to analyze"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get Q&A analytics report for a course.
+
+    - Identifies knowledge gaps based on question patterns
+    - Provides statistics on AI vs teacher resolution
+    - Generates teaching recommendations
+    """
+    try:
+        end_date = utc_now()
+        start_date = end_date - timedelta(days=days)
+
+        report = await qa_service.generate_analytics_report(
+            db=db,
+            course_id=course_id,
+            start_date=start_date,
+            end_date=end_date
+        )
+        return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/smart-ask", response_model=QALogResponse)
+async def smart_ask_question(
+    request: QALogCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    智能问答接口 - 使用知识库匹配和分诊逻辑
+
+    - 自动提取问题关键词
+    - 匹配知识库条目
+    - 根据匹配度和难度进行分诊
+    - 持久化问答记录到数据库
+    """
+    try:
+        response = await qa_engine_service.process_question(db, request)
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/stats", response_model=QALogStats)
+async def get_qa_stats(db: AsyncSession = Depends(get_db)):
+    """
+    获取问答统计信息
+
+    - 总问题数
+    - 按分诊结果统计
+    - 平均响应时间
+    - 有帮助率
+    """
+    try:
+        stats = await qa_engine_service.get_stats(db)
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/history/{student_id}", response_model=List[QALogResponse])
+async def get_student_history(
+    student_id: str,
+    limit: int = Query(default=50, ge=1, le=200, description="Maximum number of records"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    获取学生的问答历史
+
+    - 按时间倒序排列
+    - 支持限制返回数量
+    """
+    try:
+        history = await qa_service.get_student_question_history(db, student_id, limit)
+        return history
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/weakness/{student_id}")
+async def get_student_weakness(
+    student_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    获取学生的知识薄弱点报告
+
+    - 分析学生提问记录
+    - 识别知识薄弱领域
+    - 生成改进建议
+    """
+    try:
+        report = await qa_service.get_weakness_report(db, student_id)
+        return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/questions/{question_id}", response_model=QuestionResponse)
+async def get_question(question_id: str):
+    """
+    Get details of a specific question.
+    """
+    if question_id not in qa_service._questions:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    return qa_service._questions[question_id]
+
+
+@router.get("/pending-questions", response_model=List[QALogResponse])
+async def get_pending_questions(
+    current_user = Depends(get_current_teacher_or_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    获取待回答的问题列表
+    
+    - 教师和管理员角色可以访问此端点
+    - 返回所有待处理的问题
+    """
+    try:
+        from sqlalchemy import select
+        from models.qa_log import QALog, QALogStatus, TriageResult
+        
+        # 查询所有需要教师处理的问题
+        query = select(QALog).where(
+            (QALog.triage_result == TriageResult.TO_TEACHER) |
+            (QALog.status == QALogStatus.PENDING) |
+            ((QALog.triage_result == TriageResult.TO_ASSISTANT) & (QALog.status == QALogStatus.PENDING))
+        ).order_by(QALog.priority.desc(), QALog.created_at.asc())
+        
+        result = await db.execute(query)
+        pending_questions = result.scalars().all()
+        
+        return [qa_service._log_to_response(q) for q in pending_questions]
+    except Exception as e:
+        logger.error(f"获取待回答问题失败: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get pending questions")
+
+
+@router.post("/answer-question", response_model=TeacherAnswerResponse)
+async def answer_question(
+    request: TeacherAnswerRequest,
+    current_user = Depends(get_current_teacher_or_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    教师回答问题的端点
+    
+    - 教师和管理员角色可以访问此端点
+    - 更新问答日志的状态为已回答
+    - 可选择性地更新知识库
+    """
+    try:
+        # 获取问答日志
+        from sqlalchemy import select
+        from models.qa_log import QALog, QALogStatus
+        from models.knowledge_base import KnowledgeBaseEntry
+        
+        query = select(QALog).where(QALog.log_id == request.log_id)
+        result = await db.execute(query)
+        qa_log = result.scalar_one_or_none()
+        
+        if not qa_log:
+            raise HTTPException(status_code=404, detail="Question log not found")
+        
+        # 更新问答日志
+        qa_log.answer = request.answer
+        qa_log.answer_source = "teacher"
+        qa_log.handled_by = current_user.name or current_user.student_id
+        qa_log.handled_at = utc_now()
+        qa_log.status = QALogStatus.ANSWERED
+        
+        # 如果需要更新知识库
+        knowledge_base_updated = False
+        new_entry_id = None
+        if request.update_knowledge_base:
+            # 创建知识库条目
+            entry = KnowledgeBaseEntry(
+                title=f"来自问题: {qa_log.question[:50]}...",
+                content=request.answer,
+                category=qa_log.detected_category or "General",
+                difficulty=qa_log.detected_difficulty or 3,
+                keywords=request.new_keywords or qa_log.question_keywords or [],
+                author_id=current_user.student_id,
+                is_approved=True
+            )
+            db.add(entry)
+            await db.flush()  # 获取新条目的ID
+            
+            knowledge_base_updated = True
+            new_entry_id = entry.entry_id
+        
+        await db.commit()
+        await db.refresh(qa_log)
+        
+        return TeacherAnswerResponse(
+            log_id=qa_log.log_id,
+            answer=qa_log.answer,
+            answered_by=qa_log.handled_by,
+            answered_at=qa_log.handled_at,
+            knowledge_base_updated=knowledge_base_updated,
+            new_entry_id=new_entry_id
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"教师回答问题失败: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to answer question")
+
+
+@router.get("/health")
+async def qa_health():
+    """Health check for Q&A service."""
+    return {
+        "service": "Q&A Triage",
+        "status": "healthy",
+        "questions_in_memory": len(qa_service._questions)
+    }
+
+

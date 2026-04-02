@@ -1,0 +1,125 @@
+"""
+Application Configuration Settings
+"""
+import os
+from functools import lru_cache
+from typing import List, Optional
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Application settings loaded from environment variables."""
+
+    model_config = SettingsConfigDict(
+        env_file=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"),
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+    # Application Settings
+    APP_NAME: str = "AI Teaching Assistant API"
+    APP_VERSION: str = "1.0.0"
+    APP_DESCRIPTION: str = "Backend API for AI-powered teaching assistant with automated grading and Q&A support"
+    DEBUG: bool = True
+    LOG_LEVEL: str = "INFO"
+
+    # Server Settings
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    WORKERS: int = 1
+    RELOAD: bool = True
+
+    # CORS Settings
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://localhost:3002", "http://127.0.0.1:3001", "http://127.0.0.1:3002"]
+    CORS_ALLOW_CREDENTIALS: bool = True
+    CORS_ALLOW_METHODS: List[str] = ["*"]
+    CORS_ALLOW_HEADERS: List[str] = ["*"]
+
+    # API Settings
+    API_V1_PREFIX: str = "/api/v1"
+
+    # AI/LLM Settings
+    OPENAI_API_KEY: str = ""
+    OPENAI_API_BASE: str = "https://api.openai.com/v1"
+    OPENAI_ORG_ID: Optional[str] = None
+    AI_MODEL: str = "gpt-4"
+    AI_TEMPERATURE: float = 0.7
+    AI_MAX_TOKENS: int = 2000
+    AI_TIMEOUT: int = 30
+    USE_LOCAL_LLM: bool = False
+    LOCAL_LLM_MODEL_PATH: str = ""
+
+    # FastChat Local Deployment Settings
+    USE_FASTCHAT: bool = False
+    FASTCHAT_API_BASE: str = "http://localhost:8000/v1"
+    FASTCHAT_MODEL_NAME: str = "qwen2.5-7b"
+    FASTCHAT_TEMPERATURE: float = 0.7
+    FASTCHAT_MAX_TOKENS: int = 2000
+    FASTCHAT_TIMEOUT: int = 60
+
+    # DeepSeek API Settings
+    USE_DEEPSEEK: bool = False
+    DEEPSEEK_API_KEY: str = ""
+    DEEPSEEK_API_BASE: str = "https://api.deepseek.com"
+    DEEPSEEK_MODEL: str = "deepseek-chat"
+    DEEPSEEK_TEMPERATURE: float = 0.7
+    DEEPSEEK_MAX_TOKENS: int = 2000
+    DEEPSEEK_TIMEOUT: int = 60
+    DEEPSEEK_MAX_RETRIES: int = 3
+    DEEPSEEK_RETRY_DELAY: float = 1.0
+
+    # Database Settings
+    DATABASE_URL: str = "mysql+aiomysql://ai_teaching:ai_teaching_dev@localhost:3306/ai_teaching_assistant"
+    DATABASE_ECHO: bool = False
+
+    # Redis/Cache Settings (optional)
+    REDIS_URL: Optional[str] = None
+    CACHE_TTL: int = 3600
+
+    # File Upload Settings
+    MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
+    UPLOAD_DIR: str = "./uploads"
+    UPLOAD_STORAGE_BACKEND: str = "local"
+    UPLOAD_S3_BUCKET: Optional[str] = None
+    UPLOAD_S3_REGION: Optional[str] = None
+    UPLOAD_S3_ENDPOINT_URL: Optional[str] = None
+    UPLOAD_S3_KEY_PREFIX: str = "uploads"
+    UPLOAD_S3_ACCESS_KEY_ID: Optional[str] = None
+    UPLOAD_S3_SECRET_ACCESS_KEY: Optional[str] = None
+    ALLOWED_EXTENSIONS: List[str] = [
+        ".py", ".java", ".cpp", ".c", ".cc", ".cxx",
+        ".js", ".jsx", ".ts", ".tsx", ".php",
+        ".h", ".hpp",
+        ".pdf", ".docx", ".txt"
+    ]
+
+    # Code Analysis Settings
+    MAX_LINE_LENGTH: int = 120
+    COMPLEXITY_THRESHOLD: int = 10
+    MIN_MAINTAINABILITY_INDEX: float = 20.0
+
+    # Plagiarism Detection Settings
+    PLAGIARISM_THRESHOLD: float = 0.7
+    STORE_SUBMISSIONS: bool = True
+
+    # Security Settings
+    SECRET_KEY: str = "change-this-in-production-use-a-secure-random-key"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    TOKEN_URL: str = "/api/v1/auth/login"
+
+    # Rate Limiting
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_REQUESTS: int = 100
+    RATE_LIMIT_PERIOD: int = 60
+
+@lru_cache()
+def get_settings() -> Settings:
+    """Get cached settings instance."""
+    return Settings()
+
+
+settings = get_settings()
+
