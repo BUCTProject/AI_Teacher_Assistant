@@ -49,6 +49,7 @@ coverage.xml
 *.py.cover
 .hypothesis/
 .pytest_cache/
+.codex-pytest-cache/
 cover/
 
 # Translations
@@ -215,6 +216,19 @@ docker-compose.override.yml
 !.env.development
 !.env.staging
 !.env.production
+
+# Node / frontend artifacts
+node_modules/
+frontend/node_modules/
+frontend/build/
+
+# Local runtime and workspace artifacts
+outputs/runtime/
+temp/
+backend/.codex-test-tmp/
+backend/.tmp-pip/
+backend/pytest-cache-files-*/
+*.bak
 
 # MySQL data and dumps
 mysql_data/
