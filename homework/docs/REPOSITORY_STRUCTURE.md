@@ -2,53 +2,61 @@
 
 ## Goal
 
-This repository should read like a two-application workspace, not a flat dump of unrelated files. The conventions below define where new files should go and which directories are considered generated versus source-of-truth.
+This repository should read like a small workspace with two applications, not a root-level dumping ground. Source-of-truth code lives in app directories; the root is reserved for orchestration and shared documentation.
 
 ## Top-Level Layout
 
 | Path | Role | Notes |
 |------|------|-------|
-| `backend/` | FastAPI backend | Owns API routes, services, models, migrations, and backend test suites. |
-| `frontend/` | React frontend | Owns pages, components, hooks, styles, i18n, and frontend test suites. |
-| `docs/` | Stable documentation | Product, setup, debugging, reports, and governed planning artifacts. |
-| `scripts/` | Root orchestration | Thin wrappers that delegate into backend/frontend workflows. |
-| `public/` | Root-level static assets | Keep only if they are still needed by root tooling or deployment. |
-| `config/`, `models/`, `file_manager/`, `uploads/`, `shrimp_data/` | Legacy/shared project assets | Treat carefully; do not move without confirming runtime ownership. |
-| `temp/` | Scratch workspace | Local-only, ignored from git. |
-| `outputs/runtime/` | Runtime receipts | Local-only evidence and session artifacts, ignored from git. |
+| `backend/` | FastAPI backend | API routes, services, models, migrations, backend scripts, backend tests. |
+| `frontend/` | React frontend | Components, pages, hooks, i18n, frontend tests, frontend build config. |
+| `docs/` | Stable docs | Setup, product docs, reports, TODO index, and governed planning artifacts. |
+| `issues/` | Backlog notes | Feature proposals or issue writeups that are not product code. |
+| `scripts/` | Workspace helpers | Thin root-level wrappers such as dev startup and environment checks. |
+| `temp/` | Scratch space | Local-only and ignored. |
+| `outputs/runtime/` | Runtime receipts | Local-only `vibe` evidence and other generated receipts, ignored. |
+
+## Documentation Layout
+
+| Path | Role |
+|------|------|
+| `docs/DEVELOPMENT_SETUP.md` | Authoritative setup and debugging guide |
+| `docs/REPOSITORY_STRUCTURE.md` | This ownership and placement document |
+| `docs/TODO.md` | Index for roadmap docs |
+| `docs/TODO.en.md` | English roadmap |
+| `docs/TODO.zh-CN.md` | Chinese roadmap |
+| `docs/requirements/` | Frozen governed requirement docs |
+| `docs/plans/` | Frozen governed execution plans |
 
 ## Placement Rules
 
-1. New product code goes under `backend/` or `frontend/`, not the repository root.
-2. Root scripts should orchestrate existing app commands; they should not duplicate backend or frontend business logic.
-3. Stable human-facing documentation belongs in `docs/`.
-4. Generated test caches, scratch folders, and one-off runtime receipts belong under ignored paths such as `temp/` or `outputs/runtime/`.
-5. Backup files such as `*.bak` should not be added as intentional project artifacts.
+1. New application code belongs in `backend/` or `frontend/`.
+2. The repository root should not host a second frontend, a second backend, or ad hoc test scripts.
+3. Root scripts may orchestrate app commands but should not duplicate business logic already owned by an app.
+4. Stable human-facing documentation belongs under `docs/`.
+5. Logs, temporary exports, generated receipts, local uploads, and install snapshots should stay ignored and out of git.
 
-## Existing Repository Realities
+## Configuration Rules
 
-- The repo already contains some legacy root files and directories. This document does not reclassify them automatically.
-- The root `package.json` should remain a workspace convenience entrypoint, not a second frontend package.
-- `frontend/package.json` remains the authoritative manifest for frontend dependencies.
-- Backend Python dependency management remains inside `backend/`.
+- The root `package.json` is a workspace convenience manifest only.
+- `frontend/package.json` is the authoritative frontend dependency manifest.
+- Backend Python dependency management is owned by `backend/requirements*.txt` and `backend/pyproject.toml`.
+- Local backend settings belong in `backend/.env`; local frontend settings belong in `frontend/.env`.
+
+## Cleanup Notes
+
+- Legacy root helper scripts, duplicate root assets, and empty legacy directories were removed during cleanup.
+- Do not recreate root-level `public/`, ad hoc test scripts, or one-off install reports unless they become documented sources of truth.
 
 ## Recommended Workflow
-
-### Start the stack
 
 ```bash
 npm run dev
 ```
 
-### Frontend-only
-
 ```bash
-npm run frontend:start
-npm run frontend:build
-npm run frontend:test
+npm run check:env
 ```
-
-### Backend-only
 
 ```bash
 cd backend
@@ -57,7 +65,7 @@ python -m uvicorn app.main:app --reload --port 8000
 
 ## Change Review Checklist
 
-- Does this file live under the correct app or documentation directory?
-- Is this artifact source-of-truth, or should it be generated/ignored instead?
-- Is the repository root being used only for shared orchestration, docs, or legacy compatibility?
-- If a new top-level directory is being introduced, is its ownership and retention policy documented?
+- Is this file in the correct application or documentation directory?
+- Is it a source file, or should it be generated and ignored instead?
+- Does it add a second source of truth for setup, installs, or runtime behavior?
+- If a new top-level path is introduced, is its ownership documented here?

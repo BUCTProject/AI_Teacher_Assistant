@@ -8,8 +8,5 @@
     "frontend:start": "npm --prefix frontend start",
     "frontend:build": "npm --prefix frontend run build",
     "frontend:test": "npm --prefix frontend test -- --watch=false"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.1.18"
   }
 }

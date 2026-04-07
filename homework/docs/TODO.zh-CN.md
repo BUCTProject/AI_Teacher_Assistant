@@ -24,10 +24,10 @@
 - ✅ API 文档（Swagger UI）
 
 **相关文档：**
-- 📄 [用户界面指南](docs/USER_INTERFACE_GUIDE.md)
-- 📄 [系统测试报告](docs/SYSTEM_TESTING_REPORT.md)
-- 📄 [调试指南](docs/DEBUGGING_GUIDE.md)
-- 📄 [认证测试结果](backend/TEST_RESULTS.md) (新增)
+- 📄 [用户界面指南](./USER_INTERFACE_GUIDE.md)
+- 📄 [系统测试报告](./SYSTEM_TESTING_REPORT.md)
+- 📄 [开发环境设置](./DEVELOPMENT_SETUP.md)
+- 📄 [认证测试结果](../backend/TEST_RESULTS.md) (新增)
 
 ---
 
@@ -366,10 +366,10 @@
   - 带上下文变量的结构化日志
   - 详细跟踪的请求/响应中间件
 
-- [x] 🟡 **一键启动系统** - `scripts/dev-start.js`, `dev-start.bat`, `dev-start.sh`
+- [x] 🟡 **一键启动系统** - `scripts/dev-start.js`, `scripts/check-environment.js`
   - 并行前后端服务启动
-  - 自动浏览器打开和健康检查
-  - 跨平台支持（Windows/Unix）
+  - 在仓库根目录执行环境检查
+  - 通过 `npm run dev` 和 `npm run check:env` 提供统一入口
   - 优雅关闭和进程管理
 
 - [x] 🟢 **开发文档** - `docs/DEVELOPMENT_SETUP.md`

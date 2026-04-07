@@ -24,10 +24,10 @@ The MVP (Minimum Viable Product) is now complete with the following core feature
 - ✅ API Documentation (Swagger UI)
 
 **Documentation:**
-- 📄 [User Interface Guide](docs/USER_INTERFACE_GUIDE.md)
-- 📄 [System Testing Report](docs/SYSTEM_TESTING_REPORT.md)
-- 📄 [Debugging Guide](docs/DEBUGGING_GUIDE.md)
-- 📄 [Authentication Test Results](backend/TEST_RESULTS.md) (NEW)
+- 📄 [User Interface Guide](./USER_INTERFACE_GUIDE.md)
+- 📄 [System Testing Report](./SYSTEM_TESTING_REPORT.md)
+- 📄 [Development Setup](./DEVELOPMENT_SETUP.md)
+- 📄 [Authentication Test Results](../backend/TEST_RESULTS.md) (NEW)
 
 ---
 
@@ -366,10 +366,10 @@ The MVP (Minimum Viable Product) is now complete with the following core feature
   - Structured logging with context variables
   - Request/response middleware with detailed tracking
 
-- [x] 🟡 **One-Click Startup System** - `scripts/dev-start.js`, `dev-start.bat`, `dev-start.sh`
+- [x] 🟡 **One-Click Startup System** - `scripts/dev-start.js`, `scripts/check-environment.js`
   - Parallel frontend/backend service launching
-  - Automatic browser opening and health checking
-  - Cross-platform support (Windows/Unix)
+  - Environment validation from the repository root
+  - Workspace-level entry points through `npm run dev` and `npm run check:env`
   - Graceful shutdown and process management
 
 - [x] 🟢 **Development Documentation** - `docs/DEVELOPMENT_SETUP.md`

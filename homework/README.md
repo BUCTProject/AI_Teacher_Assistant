@@ -1,98 +1,67 @@
 # AI Teaching Assistant
 
-AI Teaching Assistant is a full-stack teaching support platform with a FastAPI backend and a React frontend. This repository currently behaves like a small monorepo: the application code lives in `backend/` and `frontend/`, while the repository root provides shared docs, startup scripts, and workspace-level hygiene.
+AI Teaching Assistant is a FastAPI + React workspace. The live application code is split between `backend/` and `frontend/`; the repository root is reserved for shared documentation, lightweight orchestration, and workspace-level config.
 
-## Repository Entry Points
-
-Use the repository root when you want one stable place to start from:
+## Workspace Entry Points
 
 ```bash
-# Start frontend + backend together
+# Start backend + frontend from the repo root
 npm run dev
 
-# Check local environment assumptions
+# Validate local prerequisites and folder layout
 npm run check:env
 
-# Frontend-only commands from the root
+# Frontend commands from the repo root
 npm run frontend:start
 npm run frontend:build
 npm run frontend:test
 ```
 
-You can still work directly inside each app:
+You can still work inside each app directly:
 
 ```bash
-# Backend
 cd backend
 python -m uvicorn app.main:app --reload --port 8000
 
-# Frontend
-cd frontend
+cd ../frontend
 npm start
 ```
 
-## Structure
+## Project Layout
 
 ```text
 .
-├── backend/                  FastAPI service, database, tests, scripts
+├── backend/                  FastAPI API, models, services, migrations, tests
 ├── frontend/                 React application
-├── docs/                     Stable project documentation
-├── scripts/                  Root-level helpers such as dev startup and env checks
-├── public/                   Legacy/static root assets
-├── temp/                     Local scratch space, ignored from version control
-└── outputs/runtime/          Runtime receipts and generated evidence, ignored
+├── docs/                     Stable project documentation and governed artifacts
+├── issues/                   Product and backlog notes
+├── scripts/                  Root-level workspace helpers
+├── temp/                     Local scratch space, ignored
+└── outputs/runtime/          Local runtime receipts, ignored
 ```
 
-For a more detailed map of what belongs where, see [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md).
+See [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md) for placement rules and ownership boundaries.
 
-## What Lives Where
+## Environment Files
 
-- `backend/`: API routes, services, models, migrations, backend tests, backend-specific scripts.
-- `frontend/`: React pages, components, hooks, types, i18n resources, frontend tests.
-- `docs/`: user/developer documentation plus governed requirement and execution-plan artifacts.
-- `scripts/`: root orchestration scripts that should stay thin and delegate into `backend/` or `frontend/`.
-- `temp/` and `outputs/runtime/`: generated or local-only working directories that should not become source-of-truth.
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- MySQL if you want full backend integration
-
-### Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-alembic upgrade head
-python -m uvicorn app.main:app --reload --port 8000
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm start
-```
+- `backend/.env.example`: authoritative backend template for local development.
+- `frontend/.env.example`: authoritative frontend template for local development.
+- `.env.development`, `.env.staging`, `.env.production`: root-level deployment or compose presets, not replacements for `backend/.env`.
 
 ## Common Docs
 
-- [docs/DEVELOPMENT_SETUP.md](docs/DEVELOPMENT_SETUP.md)
-- [docs/DEBUGGING_GUIDE.md](docs/DEBUGGING_GUIDE.md)
-- [docs/SYSTEM_TESTING_REPORT.md](docs/SYSTEM_TESTING_REPORT.md)
-- [docs/USER_INTERFACE_GUIDE.md](docs/USER_INTERFACE_GUIDE.md)
-- [TODO.md](TODO.md)
-- [TODO_zh-CN.md](TODO_zh-CN.md)
+- [Development Setup](docs/DEVELOPMENT_SETUP.md)
+- [Repository Structure](docs/REPOSITORY_STRUCTURE.md)
+- [System Testing Report](docs/SYSTEM_TESTING_REPORT.md)
+- [User Interface Guide](docs/USER_INTERFACE_GUIDE.md)
+- [TODO Index](docs/TODO.md)
 
-## Maintenance Notes
+## Maintenance Rules
 
-- Treat the repository root as orchestration and documentation space, not as a second app.
-- Prefer adding new frontend dependencies inside `frontend/package.json` and new backend dependencies inside `backend/requirements*.txt` or `backend/pyproject.toml`.
-- Keep generated files, caches, scratch directories, and runtime receipts out of version control unless they are intentional documentation artifacts.
+- Keep new product code under `backend/` or `frontend/`.
+- Keep root scripts thin; they should orchestrate existing app commands rather than duplicate app logic.
+- Keep generated files, caches, logs, scratch directories, and runtime receipts out of git.
+- Prefer one authoritative document per topic instead of parallel setup, install, and debugging guides.
 
 ## License
 

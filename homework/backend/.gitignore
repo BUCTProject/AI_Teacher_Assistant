@@ -40,10 +40,13 @@ env/
 
 # Testing
 .pytest_cache/
+pytest-cache-files-*/
 .coverage
 htmlcov/
 .tox/
 .nox/
+.codex-test-tmp/
+.tmp-pip/
 
 # Type checking
 .mypy_cache/
@@ -60,6 +63,9 @@ dmypy.json
 
 # Uploads
 uploads/
+test_output.txt
+installed_packages.txt
+environment.yml
 
 # Logs
 *.log

@@ -2,13 +2,12 @@
 
 ## Execution Summary
 
-Execute a serial, low-risk repository-organization pass focused on root-level clarity, documentation, and generated-artifact hygiene.
+Execute a serial repository cleanup pass focused on documentation consolidation, root-level simplification, conservative dependency cleanup, and generated-artifact hygiene.
 
 ## Frozen Inputs
 
 - Requirement doc: `docs/requirements/2026-04-06-project-tidy.md`
 - Current dirty worktree must be preserved.
-- Existing frontend manifest changes are outside this task's write scope.
 
 ## Anti-Proxy-Goal-Drift Controls
 
@@ -16,78 +15,81 @@ Prefill from the frozen requirement doc where available. Only diverge with expli
 
 ### Primary Objective
 
-Improve repository navigability and hygiene without changing product functionality.
+Improve repository navigability, documentation clarity, and configuration hygiene without changing product functionality.
 
 ### Non-Objective Proxy Signals
 
-- Large or flashy reorganization diff.
-- Moving code between directories.
-- Treating generated receipts as source-of-truth.
+- Removing active source files.
+- Treating historical reports or install snapshots as authoritative docs.
+- Removing dependencies without confirming lack of usage through search.
 
 ### Validation Material Role
 
-Use repo files and command output to verify organization changes; do not infer permission for structural migration from them.
+Use repo files, searches, and command output to verify cleanup candidates; do not infer permission for structural migration from them.
 
 ### Declared Tier
 
-Lightweight brownfield cleanup.
+Brownfield cleanup.
 
 ### Intended Scope
 
-Root README, root package manifest, ignore rules, repository structure doc, runtime receipts.
+README, setup doc, structure doc, TODO docs, env templates, dependency manifests, ignore rules, governed artifacts, and redundant repo-local files proven stale.
 
 ### Abstraction Layer Target
 
-Repository organization and workflow surface.
+Repository organization, workflow surface, and local configuration surface.
 
 ### Completion State Target
 
-Workspace entrypoints and structure are documented, generated artifacts are ignored, and no app logic was changed.
+Workspace docs are consolidated, redundant root artifacts are removed, dependency manifests are cleaned conservatively, and no product logic changed.
 
 ### Generalization Evidence Plan
 
-- Inspect resulting diff.
-- Confirm root `package.json` scripts can be read by Node.
-- Confirm files were added under the planned documentation paths.
+- Inspect the resulting diff.
+- Confirm the root and frontend manifests remain readable JSON.
+- Confirm moved TODO docs and setup docs exist under `docs/`.
+- Confirm removed files are no longer referenced by root docs.
 
 ## Internal Grade Decision
 
 `L`
 
-Reason: the task spans multiple artifacts and requires governed planning, but it does not justify XL parallel execution or application-level refactoring.
+Reason: the task spans multiple artifacts and some removals, but it does not justify XL parallel execution or application-level refactoring.
 
 ## Wave Plan
 
 ### Wave 1
 
-- Create governed runtime artifacts for skeleton and intent.
-- Freeze requirement and plan documents.
+- Refresh governed runtime artifacts for skeleton and intent.
+- Freeze requirement and plan documents against the actual cleanup scope.
 
 ### Wave 2
 
-- Update root `package.json` with workspace scripts.
-- Update `.gitignore` with generated-artifact policy.
-- Rewrite root `README.md` as a repository entrypoint.
-- Add `docs/REPOSITORY_STRUCTURE.md`.
+- Remove stale root scripts, duplicate root assets, generated reports, and empty root legacy directories.
+- Move TODO docs under `docs/`.
+- Consolidate setup/debug/install guidance into `docs/DEVELOPMENT_SETUP.md`.
+- Rewrite root `README.md` and `docs/REPOSITORY_STRUCTURE.md`.
+- Update `.gitignore`, env templates, and dependency manifests.
 
 ### Wave 3
 
-- Run minimal verification commands.
+- Run targeted verification commands and searches.
 - Write execution and cleanup receipts.
 
 ## Ownership Boundaries
 
 - Root-governed lane only.
-- Write scope: `README.md`, `.gitignore`, root `package.json`, `docs/`, `outputs/runtime/`.
+- Write scope: repository docs, workspace manifests, env templates, ignore files, and redundant files explicitly removed by this cleanup.
 - No subagents.
-- No edits inside already modified frontend manifests.
 
 ## Verification Commands
 
 ```powershell
 node -p "Object.keys(require('./package.json').scripts).join(', ')"
-git diff --stat -- README.md .gitignore package.json docs
+node -p "require('./frontend/package.json').dependencies['axios']"
+git diff --stat
 git status --short
+rg -n "DEBUGGING_GUIDE|TODO_zh-CN|TODO\.md" README.md docs backend frontend
 ```
 
 ## Rollback Plan
@@ -98,6 +100,6 @@ git status --short
 ## Phase Cleanup Contract
 
 - Record verification results in a phase receipt.
-- Record that no destructive cleanup was performed.
+- Record which stale files were removed or consolidated.
 - Leave runtime receipts under `outputs/runtime/`.
 - Downgrade completion language if verification fails or if any scope drift occurs.
