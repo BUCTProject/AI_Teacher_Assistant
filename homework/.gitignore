@@ -252,3 +252,9 @@ backend/uploads/*
 
 .qwen/
 gha-creds-*.json
+
+# MCP (Model Context Protocol) - local overrides with actual tokens
+# The committed .mcp.json and .cursor/mcp.json use ${ENV_VAR} references only.
+# Create these local files for token overrides; they must NOT be committed.
+.mcp.local.json
+.cursor/mcp.local.json
