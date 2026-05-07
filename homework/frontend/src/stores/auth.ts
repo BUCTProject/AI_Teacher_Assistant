@@ -4,15 +4,16 @@ import type { User, LoginCredentials, RegisterData } from '@/types'
 import { authApi } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  // State
-  const user = ref<User | null>(null)
+  // State - 从 localStorage 恢复用户信息
+  const storedUser = localStorage.getItem('user')
+  const user = ref<User | null>(storedUser ? JSON.parse(storedUser) : null)
   const token = ref<string | null>(localStorage.getItem('token'))
   const refreshTokenValue = ref<string | null>(localStorage.getItem('refreshToken'))
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
   // Getters
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!token.value)
   const userRole = computed(() => user.value?.role || null)
   const userName = computed(() => user.value?.name || '')
 
@@ -23,13 +24,20 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await authApi.login(credentials)
-      token.value = response.access_token
-      refreshTokenValue.value = response.refresh_token
-      user.value = response.user
 
-      // Persist tokens
-      localStorage.setItem('token', response.access_token)
-      localStorage.setItem('refreshToken', response.refresh_token)
+      // 后端返回结构：{ user, tokens: { access_token, refresh_token, token_type, expires_in } }
+      const accessToken = response.tokens?.access_token || response.token
+      const refreshToken = response.tokens?.refresh_token || response.refreshToken
+
+      // 保存token
+      token.value = accessToken
+      refreshTokenValue.value = refreshToken
+      localStorage.setItem('token', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+
+      // 设置用户并保存到 localStorage
+      user.value = response.user
+      localStorage.setItem('user', JSON.stringify(response.user))
 
       return true
     } catch (err: any) {
@@ -88,6 +96,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshTokenValue.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
   }
 
   function clearError() {

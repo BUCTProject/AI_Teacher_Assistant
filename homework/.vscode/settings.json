@@ -1,4 +1,5 @@
 {
+    "python.defaultInterpreterPath": "E:\\Code\\repo\\envs\\ai-teaching\\python.exe",
     "python.testing.unittestArgs": [
         "-v",
         "-s",

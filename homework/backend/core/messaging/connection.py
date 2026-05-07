@@ -18,10 +18,10 @@ async def get_connection() -> Optional[aio_pika.RobustConnection]:
 
     if _connection is None or _connection.is_closed:
         try:
-            rabbitmq_url = os.getenv(
-                "RABBITMQ_URL",
-                "amqp://ai_ta:ai_ta_dev@localhost:5672/"
-            )
+            rabbitmq_url = os.getenv("RABBITMQ_URL", "")
+            # Skip connection if RABBITMQ_URL is empty or not set
+            if not rabbitmq_url:
+                return None
             _connection = await aio_pika.connect_robust(rabbitmq_url)
             logger.info("Connected to RabbitMQ")
         except Exception as e:

@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 import AppHeader from './components/layout/AppHeader.vue'
 import ToastContainer from './components/common/ToastContainer.vue'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const showHeader = computed(() => !route.meta.hideHeader)
+
+// 应用启动时恢复登录状态
+onMounted(async () => {
+  if (authStore.token && !authStore.user) {
+    await authStore.fetchCurrentUser()
+  }
+})
 </script>
 
 <template>

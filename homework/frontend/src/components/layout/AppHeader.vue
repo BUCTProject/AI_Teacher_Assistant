@@ -31,15 +31,30 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-const goTo = (path: string) => {
-  router.push(path)
+const handleMenuSelect = (index: string) => {
+  const routeMap: Record<string, string> = {
+    'dashboard': '/dashboard',
+    'grades': '/grades',
+    'teacher': '/teacher',
+    'manage-assignments': '/manage-assignments',
+    'grading': '/grading',
+    'question-queue': '/question-queue',
+    'code-analysis': '/code-analysis',
+    'qa': '/qa',
+    'plagiarism': '/plagiarism',
+    'report-analysis': '/report-analysis',
+  }
+  const path = routeMap[index]
+  if (path) {
+    router.push(path)
+  }
 }
 </script>
 
 <template>
   <el-header class="app-header">
     <div class="header-left">
-      <div class="logo" @click="goTo('/')">
+      <div class="logo" @click="router.push('/')">
         <el-icon><School /></el-icon>
         <span>AI Teaching Assistant</span>
       </div>
@@ -49,14 +64,15 @@ const goTo = (path: string) => {
         class="header-menu"
         mode="horizontal"
         :ellipsis="false"
+        @select="handleMenuSelect"
       >
         <!-- Student Navigation -->
         <template v-if="isStudent">
-          <el-menu-item index="dashboard" @click="goTo('/dashboard')">
+          <el-menu-item index="dashboard">
             <el-icon><HomeFilled /></el-icon>
             <span>Dashboard</span>
           </el-menu-item>
-          <el-menu-item index="grades" @click="goTo('/grades')">
+          <el-menu-item index="grades">
             <el-icon><Trophy /></el-icon>
             <span>成绩</span>
           </el-menu-item>
@@ -64,19 +80,19 @@ const goTo = (path: string) => {
 
         <!-- Teacher Navigation -->
         <template v-if="isTeacher">
-          <el-menu-item index="teacher" @click="goTo('/teacher')">
+          <el-menu-item index="teacher">
             <el-icon><HomeFilled /></el-icon>
             <span>Dashboard</span>
           </el-menu-item>
-          <el-menu-item index="manage-assignments" @click="goTo('/manage-assignments')">
+          <el-menu-item index="manage-assignments">
             <el-icon><Document /></el-icon>
             <span>作业管理</span>
           </el-menu-item>
-          <el-menu-item index="grading" @click="goTo('/grading')">
+          <el-menu-item index="grading">
             <el-icon><EditPen /></el-icon>
             <span>批改作业</span>
           </el-menu-item>
-          <el-menu-item index="question-queue" @click="goTo('/question-queue')">
+          <el-menu-item index="question-queue">
             <el-icon><ChatDotRound /></el-icon>
             <span>问题队列</span>
           </el-menu-item>
@@ -86,19 +102,19 @@ const goTo = (path: string) => {
               <el-icon><Tools /></el-icon>
               <span>高级功能</span>
             </template>
-            <el-menu-item index="code-analysis" @click="goTo('/code-analysis')">
+            <el-menu-item index="code-analysis">
               <el-icon><Monitor /></el-icon>
               <span>代码分析</span>
             </el-menu-item>
-            <el-menu-item index="qa" @click="goTo('/qa')">
+            <el-menu-item index="qa">
               <el-icon><ChatLineRound /></el-icon>
               <span>智能问答</span>
             </el-menu-item>
-            <el-menu-item index="plagiarism" @click="goTo('/plagiarism')">
+            <el-menu-item index="plagiarism">
               <el-icon><Search /></el-icon>
               <span>抄袭检测</span>
             </el-menu-item>
-            <el-menu-item index="report-analysis" @click="goTo('/report-analysis')">
+            <el-menu-item index="report-analysis">
               <el-icon><DocumentChecked /></el-icon>
               <span>报告分析</span>
             </el-menu-item>
@@ -106,11 +122,11 @@ const goTo = (path: string) => {
         </template>
 
         <!-- Common Features -->
-        <el-menu-item index="smart-qa" @click="goTo('/smart-qa')">
+        <el-menu-item index="smart-qa">
           <el-icon><ChatLineRound /></el-icon>
           <span>智能答疑</span>
         </el-menu-item>
-        <el-menu-item index="knowledge-base" @click="goTo('/knowledge-base')">
+        <el-menu-item index="knowledge-base">
           <el-icon><Reading /></el-icon>
           <span>知识库</span>
         </el-menu-item>
@@ -126,7 +142,7 @@ const goTo = (path: string) => {
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="goTo('/account')">
+            <el-dropdown-item @click="router.push('/account')">
               <el-icon><Setting /></el-icon>
               账号设置
             </el-dropdown-item>
