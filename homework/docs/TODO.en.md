@@ -801,16 +801,25 @@ The MVP (Minimum Viable Product) is now complete with the following core feature
   - Memory usage and rendering performance tracking
   - **File:** `frontend/src/components/DevTools/PerformanceMonitor.tsx`
 
-- [ ] 🟢 **Enhance Error Boundary Component** (P2)
+- [x] 🟢 **Enhance Error Boundary Component** (P2) ✅ 2026-04-12
   - Upgrade `frontend/src/components/common/ErrorBoundary.tsx`
-  - Add error reporting and retry mechanisms
-  - Debug information display
+  - ✅ Error reporting: auto-generated errorId + ISO timestamp + structured console.group logs
+  - ✅ Retry mechanism: "Retry" button resets state and increments retryCount; "Reload" as fallback
+  - ✅ Debug info display: collapsible error stack + component stack (shown by default in development)
+  - ✅ Optional `onError` callback (for Sentry / custom monitoring integration)
+  - ✅ Optional `fallback` render prop (custom degraded UI)
+  - ✅ Optional `showDebugInfo` prop (force-control debug panel visibility)
+  - ✅ Fully backward compatible: existing `<ErrorBoundary>` usage in App.tsx needs no changes
   - **File:** `frontend/src/components/common/ErrorBoundary.tsx`
 
-- [ ] 🟢 **Add Service Health Check Automation** (P2)
+- [x] 🟢 **Add Service Health Check Automation** (P2) ✅ 2026-04-12
   - Create `scripts/health-check.js`
-  - Periodic frontend/backend service status checking
-  - Automatic service restart on failure
+  - ✅ Periodic HTTP ping of frontend (3000) and backend (8000/health), default interval 10s
+  - ✅ Failure count accumulation; alert when threshold (default 3) is exceeded
+  - ✅ `--restart` flag: auto-spawn the corresponding service process on threshold breach
+  - ✅ Colored console output consistent with dev-start.js style
+  - ✅ CLI args: `--interval <seconds>` `--threshold <count>` `--restart`
+  - ✅ Graceful exit (SIGINT/SIGTERM) with automatic cleanup of managed processes
   - **File:** `scripts/health-check.js`
 
 - [ ] 🟢 **Optimize package.json Scripts** (P2)

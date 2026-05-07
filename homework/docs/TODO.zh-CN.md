@@ -798,16 +798,25 @@
   - 内存使用和渲染性能跟踪
   - **文件：** `frontend/src/components/DevTools/PerformanceMonitor.tsx`
 
-- [ ] 🟢 **增强错误边界组件** (P2)
+- [x] 🟢 **增强错误边界组件** (P2) ✅ 2026年4月12日
   - 升级 `frontend/src/components/common/ErrorBoundary.tsx`
-  - 添加错误报告和重试机制
-  - 调试信息显示
+  - ✅ 错误报告：自动生成 errorId + ISO 时间戳 + 结构化 console.group 日志
+  - ✅ 重试机制：「重试」按钮重置 state 并递增 retryCount；「刷新页面」兜底
+  - ✅ 调试信息显示：可折叠的错误堆栈 + 组件堆栈（仅 development 环境默认展开）
+  - ✅ 可选 `onError` 回调（用于接入 Sentry 等监控服务）
+  - ✅ 可选 `fallback` render prop（自定义降级 UI）
+  - ✅ 可选 `showDebugInfo` prop（强制控制调试面板可见性）
+  - ✅ 完全向后兼容：App.tsx 中无参数用法无需修改
   - **文件：** `frontend/src/components/common/ErrorBoundary.tsx`
 
-- [ ] 🟢 **添加服务健康检查自动化** (P2)
+- [x] 🟢 **添加服务健康检查自动化** (P2) ✅ 2026年4月12日
   - 创建 `scripts/health-check.js`
-  - 定期前后端服务状态检查
-  - 失败时自动服务重启
+  - ✅ 定期 HTTP ping 前端（3000）和后端（8000/health），默认间隔 10 秒
+  - ✅ 失败次数累计，超过阈值（默认 3 次）时发出告警
+  - ✅ `--restart` 标志：失败阈值触发时自动 spawn 对应服务进程
+  - ✅ 彩色控制台输出，与 dev-start.js 风格一致
+  - ✅ 支持 CLI 参数：`--interval <秒>` `--threshold <次>` `--restart`
+  - ✅ 优雅退出（SIGINT/SIGTERM），自动清理托管进程
   - **文件：** `scripts/health-check.js`
 
 - [ ] 🟢 **优化package.json脚本** (P2)
