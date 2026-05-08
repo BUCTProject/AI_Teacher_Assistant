@@ -90,8 +90,8 @@ export const authApi = {
 
 // Assignments API
 export const assignmentsApi = {
-  async getAll() {
-    const response = await apiClient.get('/assignments/')
+  async getAll(signal?: AbortSignal) {
+    const response = await apiClient.get('/assignments/', { signal })
     return response.data
   },
 
@@ -144,9 +144,85 @@ export const submissionsApi = {
 
 // QA API
 export const qaApi = {
-  async askQuestion(question: string, category?: string) {
-    const response = await apiClient.post('/qa/ask', { question, category })
+  async askQuestion(question: string, studentId: string = 'anonymous', courseId: string = 'general') {
+    const response = await apiClient.post('/qa/ask', {
+      student_id: studentId,
+      course_id: courseId,
+      question
+    })
     return response.data
+  },
+
+  /**
+   * 流式问答 — 返回 EventSource 式的 ReadableStream
+   * 调用方通过 onChunk 回调逐步接收文本片段
+   */
+  askStream(
+    question: string,
+    options: {
+      studentId?: string
+      courseId?: string
+      onChunk: (text: string) => void
+      onDone?: (meta: { confidence: number; needs_review: boolean }) => void
+      onError?: (msg: string) => void
+    }
+  ): AbortController {
+    const controller = new AbortController()
+    const baseURL = apiClient.defaults.baseURL || '/api/v1'
+    const token = localStorage.getItem('token')
+
+    fetch(`${baseURL}/qa/ask-stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({
+        student_id: options.studentId || 'anonymous',
+        course_id: options.courseId || 'general',
+        question
+      }),
+      signal: controller.signal
+    })
+      .then(async (res) => {
+        if (!res.ok || !res.body) {
+          options.onError?.(`HTTP ${res.status}`)
+          return
+        }
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || ''
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.type === 'chunk') {
+                options.onChunk(data.content)
+              } else if (data.type === 'done') {
+                options.onDone?.({ confidence: data.confidence, needs_review: data.needs_review })
+              } else if (data.type === 'error') {
+                options.onError?.(data.message)
+              }
+            } catch { /* skip malformed */ }
+          }
+        }
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          options.onError?.(err.message)
+        }
+      })
+
+    return controller
   },
 
   async getQuestions(): Promise<QAQuestion[]> {

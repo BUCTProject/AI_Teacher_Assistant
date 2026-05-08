@@ -11,12 +11,18 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const [assignmentsRes, pendingRes] = await Promise.all([
+    const [assignmentsRes, pendingRes] = await Promise.allSettled([
       assignmentsApi.getAll(),
       gradingApi.getPendingSubmissions()
     ])
-    assignments.value = assignmentsRes
-    pendingCount.value = pendingRes?.length || 0
+    if (assignmentsRes.status === 'fulfilled') {
+      const res = assignmentsRes.value
+      assignments.value = Array.isArray(res) ? res : (res.items ?? [])
+    }
+    if (pendingRes.status === 'fulfilled') {
+      const res = pendingRes.value
+      pendingCount.value = Array.isArray(res) ? res.length : 0
+    }
   } finally {
     loading.value = false
   }

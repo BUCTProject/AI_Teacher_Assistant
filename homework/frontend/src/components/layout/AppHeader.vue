@@ -43,6 +43,8 @@ const handleMenuSelect = (index: string) => {
     'qa': '/qa',
     'plagiarism': '/plagiarism',
     'report-analysis': '/report-analysis',
+    'smart-qa': '/smart-qa',
+    'knowledge-base': '/knowledge-base',
   }
   const path = routeMap[index]
   if (path) {
@@ -60,7 +62,7 @@ const handleMenuSelect = (index: string) => {
       </div>
 
       <el-menu
-        :default-active="activeMenu"
+        :active-index="activeMenu"
         class="header-menu"
         mode="horizontal"
         :ellipsis="false"
@@ -163,38 +165,118 @@ const handleMenuSelect = (index: string) => {
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-bottom: 1px solid #e4e7ed;
-  padding: 0 20px;
+  padding: 0 28px;
   z-index: 100;
+  
+  /* Liquid Glass Effect */
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 48px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #409eff;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.02);
 }
 
 .logo .el-icon {
-  font-size: 24px;
+  font-size: 28px;
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* Glass Menu Styling */
 .header-menu {
   border-bottom: none;
+  background: transparent;
+}
+
+.header-menu :deep(.el-menu-item) {
+  border-radius: 14px;
+  padding: 10px 20px;
+  margin: 0 4px;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-menu :deep(.el-menu-item::before) {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(88, 86, 214, 0.1) 100%);
+  border-radius: 14px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.header-menu :deep(.el-menu-item:hover::before) {
+  opacity: 1;
+}
+
+.header-menu :deep(.el-menu-item:hover) {
+  color: #007AFF;
+  transform: translateY(-1px);
+}
+
+.header-menu :deep(.el-menu-item.is-active) {
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 
+    0 4px 16px rgba(0, 122, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Sub-menu styling */
+.header-menu :deep(.el-sub-menu__title) {
+  border-radius: 14px;
+  padding: 10px 20px;
+  margin: 0 4px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.25s ease;
+}
+
+.header-menu :deep(.el-sub-menu__title:hover) {
+  color: #007AFF;
+  background: rgba(0, 122, 255, 0.08);
 }
 
 .header-right {
@@ -205,20 +287,78 @@ const handleMenuSelect = (index: string) => {
 .user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  color: #606266;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background 0.3s;
+  color: rgba(0, 0, 0, 0.8);
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .user-info:hover {
-  background: #f5f7fa;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .dropdown-icon {
   margin-left: 4px;
   font-size: 12px;
+  opacity: 0.6;
+}
+
+/* Dropdown styling */
+:deep(.el-dropdown-menu) {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+}
+
+:deep(.el-dropdown-menu__item) {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+:deep(.el-dropdown-menu__item:hover) {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007AFF;
+}
+
+/* Sub-menu popover */
+:deep(.el-menu--popup) {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+}
+
+:deep(.el-menu--popup .el-menu-item) {
+  border-radius: 14px;
+  padding: 10px 20px;
+  margin: 4px 0;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  transition: all 0.2s ease;
+}
+
+:deep(.el-menu--popup .el-menu-item:hover) {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007AFF;
 }
 </style>

@@ -26,7 +26,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:9000',  // 后端端口 9000
+        target: 'http://localhost:9000',
         changeOrigin: true
       }
     }
