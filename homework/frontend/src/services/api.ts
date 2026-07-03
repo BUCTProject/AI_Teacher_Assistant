@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
-import type { User, LoginCredentials, RegisterData, Assignment, Submission, QAQuestion } from '@/types'
+import type { User, LoginCredentials, RegisterData, Assignment, QAQuestion } from '@/types'
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -193,6 +193,7 @@ export const qaApi = {
         const decoder = new TextDecoder()
         let buffer = ''
 
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read()
           if (done) break

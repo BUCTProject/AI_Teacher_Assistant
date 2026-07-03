@@ -64,13 +64,13 @@ A FastAPI-based backend service for an AI-powered teaching assistant that provid
 
 6. **Run the development server**:
    ```bash
-   python -m uvicorn app.main:app --reload --port 8000
+   python -m uvicorn app.main:app --reload --port 9000
    ```
 
 7. **Access the API**:
-   - API Documentation: http://localhost:8000/docs
-   - ReDoc Documentation: http://localhost:8000/redoc
-   - Health Check: http://localhost:8000/health
+   - API Documentation: http://localhost:9000/docs
+   - ReDoc Documentation: http://localhost:9000/redoc
+   - Health Check: http://localhost:9000/health
 
 ## API Endpoints
 

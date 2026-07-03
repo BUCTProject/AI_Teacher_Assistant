@@ -9,10 +9,6 @@ import sys
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.main import app
-from fastapi.testclient import TestClient
-
-
 # Sample code for testing
 PYTHON_CODE = """
 import os
@@ -43,12 +39,6 @@ class Calculator {
 
 export default Calculator;
 """
-
-
-@pytest.fixture
-def client():
-    """Create test client."""
-    return TestClient(app)
 
 
 class TestFileUploadAPI:
@@ -98,9 +88,9 @@ class TestFileUploadAPI:
     
     def test_upload_invalid_file_type(self, client):
         """Test uploading an invalid file type."""
-        file_content = b"This is a text file"
-        files = {'file': ('test.txt', io.BytesIO(file_content), 'text/plain')}
-        
+        file_content = b"This is a binary file"
+        files = {'file': ('test.exe', io.BytesIO(file_content), 'application/octet-stream')}
+
         response = client.post('/api/v1/files/upload', files=files)
         assert response.status_code == 400
         assert 'not allowed' in response.json()['detail'].lower()

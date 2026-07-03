@@ -98,7 +98,7 @@ services:
       # CORS
       CORS_ORIGINS: '["http://localhost:3000", "http://localhost:80", "http://frontend:80"]'
     ports:
-      - "${BACKEND_PORT:-8000}:8000"
+      - "${BACKEND_PORT:-9000}:8000"
     volumes:
       - ./backend:/app
       - backend_uploads:/app/uploads

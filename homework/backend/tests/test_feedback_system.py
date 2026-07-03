@@ -338,13 +338,6 @@ class TestFeedbackAPIEndpoints:
 class TestFeedbackTemplatesAPI:
     """Tests for Feedback Templates API endpoints."""
 
-    @pytest.fixture
-    def client(self):
-        """Create test client."""
-        from fastapi.testclient import TestClient
-        from app.main import app
-        return TestClient(app)
-
     def test_list_templates_endpoint(self, client):
         """Test GET /api/v1/feedback-templates endpoint."""
         response = client.get("/api/v1/feedback-templates")

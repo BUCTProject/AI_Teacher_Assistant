@@ -4,19 +4,8 @@ Tests for the Code Analysis API endpoints.
 import pytest
 import sys
 from pathlib import Path
-from fastapi.testclient import TestClient
-
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from app.main import create_app
-
-
-@pytest.fixture
-def client():
-    """Create a test client."""
-    app = create_app()
-    return TestClient(app)
 
 
 # ============================================

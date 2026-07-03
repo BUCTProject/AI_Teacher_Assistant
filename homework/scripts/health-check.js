@@ -32,17 +32,17 @@ const threshold    = Number(argv[argv.indexOf('--threshold') + 1] || 3);
 
 const SERVICES = {
   frontend: {
-    name: '前端 (React)',
+    name: '前端 (Vue 3)',
     url: 'http://localhost:3000',
     restartCmd: 'npm',
-    restartArgs: ['start'],
+    restartArgs: ['run', 'dev'],
     restartCwd: path.resolve(__dirname, '../frontend'),
   },
   backend: {
     name: '后端 (FastAPI)',
-    url: 'http://localhost:8000/health',
+    url: 'http://localhost:9000/health',
     restartCmd: 'python',
-    restartArgs: ['-m', 'uvicorn', 'app.main:app', '--reload', '--port', '8000'],
+    restartArgs: ['-m', 'uvicorn', 'app.main:app', '--reload', '--port', '9000'],
     restartCwd: path.resolve(__dirname, '../backend'),
   },
 };

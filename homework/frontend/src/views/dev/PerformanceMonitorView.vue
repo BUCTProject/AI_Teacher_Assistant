@@ -12,8 +12,9 @@ let interval: number | null = null
 
 onMounted(() => {
   interval = window.setInterval(() => {
-    if (performance.memory) {
-      stats.value.memory = Math.round((performance as any).memory.usedJSHeapSize / 1024 / 1024)
+    const perf = performance as any
+    if (perf.memory?.usedJSHeapSize) {
+      stats.value.memory = Math.round(perf.memory.usedJSHeapSize / 1024 / 1024)
     }
   }, 1000)
 })

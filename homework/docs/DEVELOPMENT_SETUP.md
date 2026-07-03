@@ -36,7 +36,7 @@ python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 alembic upgrade head
-python -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 9000
 ```
 
 In a second terminal:
@@ -44,7 +44,7 @@ In a second terminal:
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 
 ## Recommended Local Configuration
@@ -61,27 +61,27 @@ CORS_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
 Frontend:
 
 ```env
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_DEBUG_MODE=true
-REACT_APP_ENABLE_DEBUG_PANEL=true
-REACT_APP_ENABLE_API_LOGGING=true
-REACT_APP_ENABLE_PERFORMANCE_MONITORING=true
+VITE_API_URL=http://localhost:9000/api/v1
+VITE_DEBUG_MODE=true
+VITE_ENABLE_DEBUG_PANEL=true
+VITE_ENABLE_API_LOGGING=true
+VITE_ENABLE_PERFORMANCE_MONITORING=true
 ```
 
 ## Verification Endpoints
 
 - Frontend: `http://localhost:3000`
-- Backend health: `http://localhost:8000/health`
-- Backend OpenAPI docs: `http://localhost:8000/docs`
+- Backend health: `http://localhost:9000/health`
+- Backend OpenAPI docs: `http://localhost:9000/docs`
 
 ## Debugging Workflow
 
-Frontend debugging is controlled by the optional `REACT_APP_*` flags in `frontend/.env.example`.
+Frontend debugging is controlled by the optional `VITE_*` flags in `frontend/.env.example`.
 
-- `REACT_APP_ENABLE_DEBUG_PANEL=true` shows the in-app debug panel in development.
-- `REACT_APP_ENABLE_API_LOGGING=true` enables verbose request and response logging in `frontend/src/services/api.ts`.
-- `REACT_APP_ENABLE_PERFORMANCE_MONITORING=true` stores request timing data for the debug UI.
-- `REACT_APP_AUTO_OPEN_DEVTOOLS=true` lets the debug panel request browser devtools where supported.
+- `VITE_ENABLE_DEBUG_PANEL=true` shows the in-app debug panel in development.
+- `VITE_ENABLE_API_LOGGING=true` enables verbose request and response logging in `frontend/src/services/api.ts`.
+- `VITE_ENABLE_PERFORMANCE_MONITORING=true` stores request timing data for the debug UI.
+- `VITE_AUTO_OPEN_DEVTOOLS=true` lets the debug panel request browser devtools where supported.
 
 Backend debugging is driven by `backend/.env`.
 
@@ -95,13 +95,13 @@ Port already in use:
 
 ```powershell
 netstat -ano | findstr :3000
-netstat -ano | findstr :8000
+netstat -ano | findstr :9000
 taskkill /PID <PID> /F
 ```
 
 Frontend cannot reach backend:
 
-- Confirm `REACT_APP_API_URL` matches the backend port.
+- Confirm `VITE_API_URL` matches the backend port.
 - Confirm backend CORS origins include the frontend origin.
 - Confirm the backend is serving `GET /health`.
 

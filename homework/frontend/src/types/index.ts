@@ -133,3 +133,13 @@ export interface ToastMessage {
   message: string
   duration?: number
 }
+
+// Vue Router meta augmentation
+declare module 'vue-router' {
+  interface RouteMeta {
+    requiresAuth?: boolean
+    public?: boolean
+    roles?: string[]
+    hideHeader?: boolean
+  }
+}

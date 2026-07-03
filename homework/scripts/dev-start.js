@@ -15,16 +15,16 @@ const CONFIG = {
   frontend: {
     port: 3000,
     command: 'npm',
-    args: ['start'],
+    args: ['run', 'dev'],
     cwd: path.resolve('frontend'),
     url: 'http://localhost:3000'
   },
   backend: {
-    port: 8000,
+    port: 9000,
     command: 'python',
-    args: ['-m', 'uvicorn', 'app.main:app', '--reload', '--port', '8000'],
+    args: ['-m', 'uvicorn', 'app.main:app', '--reload', '--port', '9000'],
     cwd: path.resolve('backend'),
-    url: 'http://localhost:8000'
+    url: 'http://localhost:9000'
   }
 };
 
